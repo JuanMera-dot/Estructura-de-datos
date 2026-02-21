@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+
+namespace CampanaVacunacion
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Generación de datos 
+            HashSet<string> todosLosCiudadanos = new HashSet<string>();
+            for (int i = 1; i <= 500; i++)
+            {
+                todosLosCiudadanos.Add($"Ciudadano {i}");
+            }
+
+            HashSet<string> vacunadosPfizer = new HashSet<string>();
+            // Asignación de datos: 75 ciudadanos vacunados con Pfizer 
+            for (int i = 1; i <= 75; i++)
+            {
+                vacunadosPfizer.Add($"Ciudadano {i}");
+            }
+
+            HashSet<string> vacunadosAstraZeneca = new HashSet<string>();
+            // Asignación de datos: 75 ciudadanos vacunados con AstraZeneca.
+            for (int i = 50; i <= 124; i++)
+            {
+                vacunadosAstraZeneca.Add($"Ciudadano {i}");
+            }
+
+            // --- OPERACIONES DE TEORÍA DE CONJUNTOS ---
+
+            // 1. Ciudadanos que no se han vacunado
+            HashSet<string> vacunadosTotal = new HashSet<string>(vacunadosPfizer);
+            vacunadosTotal.UnionWith(vacunadosAstraZeneca); // Unión de Pfizer y AstraZeneca (A U B)
+            HashSet<string> noVacunados = new HashSet<string>(todosLosCiudadanos);
+
+            noVacunados.ExceptWith(vacunadosTotal); // Diferencia: Todos - Vacunados (U - (A U B))
+
+            // 2. Ciudadanos que han recibido ambas dosis
+            // Intersección de ambas vacunas (A ∩ B)
+            HashSet<string> ambasDosis = new HashSet<string>(vacunadosPfizer);
+            ambasDosis.IntersectWith(vacunadosAstraZeneca);
+
+            // 3. Ciudadanos que solo han recibido la vacuna de Pfizer
+            // Diferencia: Pfizer - AstraZeneca (A - B)
+            HashSet<string> soloPfizer = new HashSet<string>(vacunadosPfizer);
+            soloPfizer.ExceptWith(vacunadosAstraZeneca);
+
+            // 4. Ciudadanos que solo han recibido la vacuna de AstraZeneca
+            // Diferencia: AstraZeneca - Pfizer (B - A)
+            HashSet<string> soloAstraZeneca = new HashSet<string>(vacunadosAstraZeneca);
+            soloAstraZeneca.ExceptWith(vacunadosPfizer);
+
+            // Resultados
+            Console.WriteLine("===== REPORTE DE VACUNACIÓN COVID-19 ====");
+            Console.WriteLine($"Población total generada: {todosLosCiudadanos.Count} ciudadanos.");
+            Console.WriteLine($"Vacunados con Pfizer: {vacunadosPfizer.Count}");
+            Console.WriteLine($"Vacunados con AstraZeneca: {vacunadosAstraZeneca.Count}\n");
+
+            Console.WriteLine("--- Resultados solicitados ---");
+            Console.WriteLine($"1. No vacunados: {noVacunados.Count}");
+            Console.WriteLine($"2. Con ambas dosis: {ambasDosis.Count}");
+            Console.WriteLine($"3. Solo con Pfizer: {soloPfizer.Count}");
+            Console.WriteLine($"4. Solo con AstraZeneca: {soloAstraZeneca.Count}");
+
+            Console.WriteLine("\nListado de ciudadanos con ambas dosis:");
+            foreach (var ciudadano in ambasDosis)
+            {
+                Console.WriteLine(ciudadano);
+            }
+        
+            
+            Console.ReadKey();
+        }
+    }
+}
