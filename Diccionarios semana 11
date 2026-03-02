@@ -1,0 +1,117 @@
+using System;
+using System.Collections.Generic;
+
+namespace TraductorBasico
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // 1. Inicializamos el diccionario con las 10 palabras requeridas
+            Dictionary<string, string> diccionario = new Dictionary<string, string>()
+            {
+                { "tiempo", "time" },
+                { "persona", "person" },
+                { "año", "year" },
+                { "camino", "way" },
+                { "día", "day" },
+                { "cosa", "thing" },
+                { "hombre", "man" },
+                { "mundo", "world" },
+                { "vida", "life" },
+                { "ojo", "eye" }
+            };
+
+            int opcion = -1;
+
+            // 2. Bucle principal para el menú interactivo
+            while (opcion != 0)
+            {
+                Console.WriteLine("\n==================== MENÚ ====================");
+                Console.WriteLine("1. Traducir una frase");
+                Console.WriteLine("2. Agregar palabras al diccionario");
+                Console.WriteLine("0. Salir");
+                Console.Write("\nSeleccione una opción: ");
+
+                string entrada = Console.ReadLine();
+
+                if (int.TryParse(entrada, out opcion))
+                {
+                    switch (opcion)
+                    {
+                        case 1:
+                            TraducirFrase(diccionario);
+                            break;
+                        case 2:
+                            AgregarPalabra(diccionario);
+                            break;
+                        case 0:
+                            Console.WriteLine("Saliendo del programa...");
+                            break;
+                        default:
+                            Console.WriteLine("Opción no válida. Intente de nuevo.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Por favor, ingrese un número válido.");
+                }
+            }
+        }
+
+        // Método para procesar y traducir la frase completa
+        static void TraducirFrase(Dictionary<string, string> diccionario)
+        {
+            Console.Write("\nIngrese la frase: ");
+            string frase = Console.ReadLine();
+
+            // Separamos la frase en un arreglo de palabras utilizando los espacios
+            string[] palabras = frase.Split(' ');
+            string fraseTraducida = "";
+
+            foreach (string palabra in palabras)
+            {
+                // Limpiamos la palabra de signos de puntuación para poder buscarla bien
+                string palabraLimpia = palabra.Trim(',', '.', ';', ':', '?', '!').ToLower();
+
+                // Si la palabra limpia existe en nuestro diccionario, la traducimos
+                if (diccionario.ContainsKey(palabraLimpia))
+                {
+                    string traduccion = diccionario[palabraLimpia];
+                    // Reemplazamos manteniendo cualquier signo de puntuación que tuviera pegado
+                    string palabraConvertida = palabra.ToLower().Replace(palabraLimpia, traduccion);
+                    fraseTraducida += palabraConvertida + " ";
+                }
+                else
+                {
+                    // Si no existe, se añade la palabra original intacta
+                    fraseTraducida += palabra + " ";
+                }
+            }
+
+            Console.WriteLine($"\nTraducción esperada (parcial): {fraseTraducida.Trim()}");
+        }
+
+        // Método para agregar nuevas palabras
+        static void AgregarPalabra(Dictionary<string, string> diccionario)
+        {
+            Console.Write("\nIngrese la palabra en español: ");
+            string espanol = Console.ReadLine().ToLower();
+
+            Console.Write("Ingrese la traducción en inglés: ");
+            string ingles = Console.ReadLine().ToLower();
+
+            // Validamos que no exista previamente para evitar errores
+            if (!diccionario.ContainsKey(espanol))
+            {
+                diccionario.Add(espanol, ingles);
+                Console.WriteLine("¡Palabra agregada con éxito!");
+            }
+            else
+            {
+                Console.WriteLine("Esta palabra ya existe en el diccionario.");
+            }
+        }
+    }
+}
