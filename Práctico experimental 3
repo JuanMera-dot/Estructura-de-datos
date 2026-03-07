@@ -1,0 +1,175 @@
+using System;
+using System.Collections.Generic;
+
+namespace BibliotecaEstructuras
+{
+    // Clase que representa la entidad Libro
+    // Proporciona automáticamente el constructor propiedades de solo lectura, y un 'ToString()' útil.
+    record Libro(string ISBN, string Titulo, string Autor, string Categoria)
+    {
+        // Personalizamos el método ToString para que coincida con el formato.
+        public override string ToString()
+        {
+            return $"[ISBN: {ISBN}] - '{Titulo}' por {Autor} (Categoría: {Categoria})";
+        }
+    }
+
+    class Program
+    {
+        // Estructuras de datos principales
+        static Dictionary<string, Libro> inventarioLibros = new Dictionary<string, Libro>();
+        static HashSet<string> categoriasUnicas = new HashSet<string>();
+
+        static void Main(string[] args)
+        {
+            bool salir = false;
+
+            while (!salir)
+            {
+                Console.Clear();
+                Console.WriteLine("=== GESTIÓN DE BIBLIOTECA ===");
+                Console.WriteLine("1. Registrar nuevo libro");
+                Console.WriteLine("2. Visualizar inventario y categorías (Reportería)");
+                Console.WriteLine("3. Consultar libro por ISBN (Reportería)");
+                Console.WriteLine("4. Salir");
+                Console.Write("Seleccione una opción: ");
+
+                string opcion = Console.ReadLine();
+
+                switch (opcion)
+                {
+                    case "1":
+                        RegistrarLibro();
+                        break;
+                    case "2":
+                        VisualizarReporteria();
+                        break;
+                    case "3":
+                        ConsultarLibro();
+                        break;
+                    case "4":
+                        salir = true;
+                        Console.WriteLine("Saliendo del sistema...");
+                        break;
+                    default:
+                        MostrarMensajeYEsperar("Opción no válida.");
+                        break;
+                }
+            }
+        }
+
+        static void RegistrarLibro()
+        {
+            Console.Clear();
+            Console.WriteLine("--- REGISTRAR LIBRO ---");
+            
+            string isbn = LeerEntradaRequerida("Ingrese el ISBN (Código único): ");
+
+            // Validación de unicidad usando el Diccionario: O(1)
+            if (inventarioLibros.ContainsKey(isbn))
+            {
+                MostrarMensajeYEsperar("\nError: Ya existe un libro registrado con este ISBN.");
+            }
+            else
+            {
+                string titulo = LeerEntradaRequerida("Ingrese el título del libro: ");
+                string autor = LeerEntradaRequerida("Ingrese el autor: ");
+                string categoria = LeerEntradaRequerida("Ingrese la categoría: ");
+
+                // Crear el objeto y agregarlo al mapa (Diccionario)
+                Libro nuevoLibro = new Libro(isbn, titulo, autor, categoria);
+                inventarioLibros.Add(isbn, nuevoLibro);
+
+                // Agregar la categoría al conjunto
+                // Si la categoría ya existe, el HashSet la ignora
+                categoriasUnicas.Add(categoria);
+
+                MostrarMensajeYEsperar("\n¡Libro registrado con éxito!");
+            }
+        }
+
+        static void VisualizarReporteria()
+        {
+            Console.Clear();
+            Console.WriteLine("--- INVENTARIO DE LA BIBLIOTECA ---");
+
+            if (inventarioLibros.Count == 0)
+            {
+                Console.WriteLine("No hay libros registrados actualmente.");
+            }
+            else
+            {
+                Console.WriteLine("\nLista de Libros:");
+                // Iterar sobre los valores del diccionario
+                foreach (var libro in inventarioLibros.Values)
+                {
+                    Console.WriteLine(libro.ToString());
+                }
+
+                Console.WriteLine("\n--- CATEGORÍAS DISPONIBLES ---");
+                // Iterar sobre el conjunto
+                foreach (var categoria in categoriasUnicas)
+                {
+                    Console.WriteLine($"- {categoria}");
+                }
+            }
+
+            MostrarMensajeYEsperar(""); // Solo para pausar y volver al menú
+        }
+
+        static void ConsultarLibro()
+        {
+            Console.Clear();
+            Console.WriteLine("--- CONSULTAR LIBRO ---");
+            Console.Write("Ingrese el ISBN del libro a buscar: ");
+            string isbnBuscar = Console.ReadLine(); // No es crítico si está vacío, la búsqueda simplemente fallará.
+            // Búsqueda instantánea usando TryGetValue: O(1)
+            if (inventarioLibros.TryGetValue(isbnBuscar, out Libro libroEncontrado))
+            {
+                Console.WriteLine("\nLibro encontrado:");
+                Console.WriteLine(libroEncontrado.ToString());
+            }
+            else
+            {
+                Console.WriteLine("\nNo se encontró ningún libro con ese ISBN.");
+            }
+
+            MostrarMensajeYEsperar(""); // Solo para pausar y volver al menú
+        }
+
+        #region Métodos de Utilidad
+
+        /// <summary>
+        /// Solicita una entrada al usuario y se asegura de que no esté vacía o solo contenga espacios.
+        /// </summary>
+        /// <param name="prompt">El mensaje a mostrar al usuario.</param>
+        /// <returns>La entrada del usuario, sin espacios al inicio o final.</returns>
+        static string LeerEntradaRequerida(string prompt)
+        {
+            string entrada;
+            do
+            {
+                Console.Write(prompt);
+                entrada = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(entrada))
+                {
+                    Console.WriteLine("Este campo no puede estar vacío. Por favor, intente de nuevo.");
+                }
+            } while (string.IsNullOrWhiteSpace(entrada));
+            return entrada.Trim();
+        }
+
+        /// <summary>
+        /// Muestra un mensaje y espera a que el usuario presione una tecla para continuar.
+        /// </summary>
+        /// <param name="mensaje">El mensaje a mostrar antes de la pausa.</param>
+        static void MostrarMensajeYEsperar(string mensaje)
+        {
+            Console.WriteLine(mensaje);
+            Console.WriteLine("\nPresione cualquier tecla para volver al menú.");
+            Console.ReadKey();
+        }
+
+        #endregion
+    }
+}
